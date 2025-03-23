@@ -42,8 +42,14 @@ Al finalizar retorna la lista creada.
 */
 
 List* crea_lista() {
-   List* L = create_list();
-   return L;
+   List *L = create_list() ;
+
+   for (int i = 1; i <= 10; i++) {
+       int *num = (int *) malloc(sizeof(int)) ;  
+       *num = i ; 
+       pushBack(L, num) ; 
+   }
+   return L;   
 }
 
 /*
@@ -52,7 +58,14 @@ Crea una función que reciba una lista de enteros (int*) y
 retorne la suma de sus elementos.
 */
 int sumaLista(List *L) {
-   return 0;
+   int suma = 0 ;
+   int *valor = first(L) ;
+
+   while (valor != NULL) {
+      suma += *valor ;  
+      valor = next(L) ;
+   }
+   return suma;
 }
 
 /*
@@ -64,8 +77,17 @@ Asume que popCurrent luego de eliminar un elemento se
 posiciona en el elemento anterior.
 */
 
-void eliminaElementos(List*L, int elem){
+void eliminaElementos(List*L, int elem) {
+   int *valor =  first(L) ;
 
+   while (valor != NULL) 
+   {
+      if (*valor == elem) {
+         free(popCurrent(L)) ;  
+      } else {
+         valor = next(L) ;
+      }
+   }
 }
 
 /*
@@ -76,6 +98,18 @@ Puedes usar una pila auxiliar.
 */
 
 void copia_pila(Stack* P1, Stack* P2) {
+   Stack* aux = create_stack() ;
+
+   while (top(P1) != NULL) {
+      void* elem = pop(P1) ;
+      push(aux, elem) ;
+   }
+
+   while (top(aux) != NULL) {
+      void* elemAux = pop(aux) ;
+      push(P1, elemAux) ;
+      push(P2, elemAux) ;
+   }   
 }
 
 /*
@@ -86,6 +120,38 @@ paraéntesis balanceados. Retorna 1 si están balanceados,
 */
 
 int parentesisBalanceados(char *cadena) {
-   return 0;
-}
+   Stack* pilaAux = create_stack() ;
+   Stack* pilaComp = create_stack() ;
+   Stack* pilaOriginal = create_stack() ;
 
+   if (pilaAux == NULL || pilaComp == NULL || pilaOriginal == NULL) return 0 ;
+
+   int largo = strlen(cadena) ;
+
+   for (int k = 0 ; k < largo ; k ++)
+   {
+      char *c = (char*) malloc(sizeof(char)) ;
+      if (!c) return 0 ;
+      *c = cadena[k] ;
+      push(pilaAux, c) ;
+      push(pilaComp, c) ;
+   }
+
+   while (top(pilaAux) != NULL)
+   {
+      push(pilaOriginal, top(pilaAux)) ;
+      pop(pilaAux) ;
+   }
+
+   while (top(pilaOriginal) != NULL)
+   {
+      char *c1 = (char*) top(pilaOriginal) ;
+      char *c2 = (char*) top(pilaComp) ;
+
+      if ((c1 && c2) && ((*c1 == '(' && *c2 != ')') || (*c1 == '{' && *c2 != '}') || (*c1 == '[' && *c2 != ']'))) return 0 ;
+            
+      free(pop(pilaOriginal));
+      free(pop(pilaComp));
+   }
+   return 1;
+}
